@@ -1,8 +1,8 @@
 import math
 
 LFIX = 4
-print('length', len('11111111111'), len('00'), len('1'),
-      len('00000000000000000'))
+# print('length', len('11111111111'), len('00'), len('1'),
+#       len('00000000000000000'))
 data = '11111111111' + '00' + '1' + '00000000000000000'
 
 
@@ -18,11 +18,12 @@ def encodeRun(input_string):
             # print(input_string[charIndex])
             count = count + 1
         else:
-            print('charIndex', charIndex)
+            # print('charIndex', charIndex, count)
             if count < LFIX:
                 encryptCode = encryptCode + ';'
                 encryptCode = encryptCode + '0'
-                passUntil = 3
+                passUntil = 4
+                charIndex = charIndex - count + 1
                 while passUntil > 0 and charIndex < length:
                     passUntil = passUntil - 1
                     encryptCode = encryptCode + input_string[charIndex]
@@ -35,7 +36,7 @@ def encodeRun(input_string):
                 LPRE = int(math.log2(count))
                 LSYM = count - 2**LPRE
                 BINSYM = format(LSYM, '0' + str(LPRE) + 'b')
-                print(count, LSYM, BINSYM)
+                # print(count, LSYM, BINSYM)
                 LPRESYM = ''
                 for i in range(LPRE - 1):
                     LPRESYM = LPRESYM + '1'
