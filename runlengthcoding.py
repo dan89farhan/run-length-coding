@@ -20,7 +20,7 @@ def encodeRun(input_string):
         else:
             # print('charIndex', charIndex, count)
             if count < LFIX:
-                encryptCode = encryptCode + ';'
+                # encryptCode = encryptCode + ';'
                 encryptCode = encryptCode + '0'
                 passUntil = 4
                 charIndex = charIndex - count + 1
@@ -42,7 +42,10 @@ def encodeRun(input_string):
                     LPRESYM = LPRESYM + '1'
                 LPRESYM = LPRESYM + '0'
 
-                encryptCode = encryptCode + ';' + LPRESYM + BINSYM + input_string[
+                # encryptCode = encryptCode + ';' + LPRESYM + BINSYM + input_string[
+                #     charIndex]
+
+                encryptCode = encryptCode + LPRESYM + BINSYM + input_string[
                     charIndex]
 
             # encryptCode = encryptCode + ';' + char + '' + str(count)
@@ -53,35 +56,57 @@ def encodeRun(input_string):
     return encryptCode
 
 
-def encode(input_string):
-    count = 1
-    prev = ''
-    lst = []
-    for character in input_string:
-        if character != prev:
-            if prev:
-                entry = (prev, count)
-                lst.append(entry)
-                #print lst
-            count = 1
-            prev = character
-        else:
+def decodeRun(encodedMessage):
+
+    length = len(encodedMessage)
+    charIndex = 0
+    decodeMessage = ''
+
+    while charIndex < length:
+        count = 0
+        if encodedMessage[charIndex] == '1':
             count += 1
-    else:
-        try:
-            entry = (character, count)
-            lst.append(entry)
-            return (lst, 0)
-        except Exception as e:
-            print("Exception encountered {e}".format(e=e))
-            return (e, 1)
+            isZeroFound = False
+            while not isZeroFound:
+                charIndex += 1
+                if encodedMessage[charIndex] == '0':
+                    isZeroFound = True
+                count += 1
 
+            print('count ', count)
+            wordLength = 2**(count)
+            sym = ''
+            while count > 0 and charIndex < length:
+                charIndex += 1
+                if (charIndex < length):
+                    sym = sym + encodedMessage[charIndex]
+                count -= 1
+            symLength = int(sym, 2)
 
-def decode(lst):
-    q = ""
-    for character, count in lst:
-        q += character * count
-    return q
+            wordLength = wordLength + symLength
+            count = 0
+            print('word length ', wordLength)
+            for i in range(wordLength):
+                decodeMessage = decodeMessage + encodedMessage[charIndex]
+            # print(decodeMessage)
+            wordLength = 0
+            charIndex += 1
+
+        elif encodedMessage[charIndex] == '0':
+            charIndex += 1
+            count = 0
+            fourChar = ''
+            while count < LFIX and charIndex < length:
+                fourChar = fourChar + encodedMessage[charIndex]
+                charIndex += 1
+                count += 1
+            charIndex -= 1
+            decodeMessage = decodeMessage + fourChar
+            print('four char ', fourChar, encodedMessage[charIndex])
+
+        charIndex += 1
+        # print(charIndex, char)
+    return decodeMessage
 
 
 #Method call
@@ -91,5 +116,10 @@ def decode(lst):
 #     print("Encoded value is {}".format(value[0]))
 #     decode(value[0])
 
+print('original data', data)
 encodedData = encodeRun(data)
 print(encodedData)
+decodedData = decodeRun(encodedData)
+print('decode data ', decodedData)
+
+print(data == decodedData)
