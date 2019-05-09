@@ -24,3 +24,11 @@ procedure.
 a variable-length codeword consists of a prefix, a length symbol
 and a tail bit. Variable length codewords are used to compress runs with the length
 L >= 4.
+
+# steps for running the project
+1) Clone the repo.
+2) open terminal.
+3) pip install -r requirements.txt # install dependency
+4) run python3 runlengthcoding.py
+
+Thanks
