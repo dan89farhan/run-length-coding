@@ -28,6 +28,7 @@ L >= 4.
 # steps for running the project
 1) Clone the repo.
 2) open terminal.
-3) run python3 runlengthcoding.py
-4) if not running then install dependency
-5) again run python3 runlengthcoding.py
+3) pip install -r requirements.txt # install dependency
+4) run python3 runlengthcoding.py
+
+Thanks
