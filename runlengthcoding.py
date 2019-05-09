@@ -73,7 +73,6 @@ def decodeRun(encodedMessage):
                     isZeroFound = True
                 count += 1
 
-            print('count ', count)
             wordLength = 2**(count)
             sym = ''
             while count > 0 and charIndex < length:
@@ -85,7 +84,7 @@ def decodeRun(encodedMessage):
 
             wordLength = wordLength + symLength
             count = 0
-            print('word length ', wordLength)
+
             for i in range(wordLength):
                 decodeMessage = decodeMessage + encodedMessage[charIndex]
             # print(decodeMessage)
@@ -102,7 +101,6 @@ def decodeRun(encodedMessage):
                 count += 1
             charIndex -= 1
             decodeMessage = decodeMessage + fourChar
-            print('four char ', fourChar, encodedMessage[charIndex])
 
         charIndex += 1
         # print(charIndex, char)
