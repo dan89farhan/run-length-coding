@@ -11,10 +11,12 @@ from scipy import misc
 
 from PIL import Image
 
-outputFile = open('output.txt', 'w')
+import runlengthcoding
+
+# outputFile = open('output.txt', 'w')
 IMG = cv2.imread('lena_gray_8.tif', 0)
 
-_8by8BitPlanes = np.zeros((8, 8, 8))
+_8by8BitPlanes = np.zeros((8, 8, 8), dtype=int)
 
 ROW_BY_ROW = 1
 COLUMN_BY_COLUMN = 2
@@ -48,36 +50,45 @@ def generateBMPRScheme(arr, bitType, blockType):
         whichScheme = 'Column by Column bit and Row by Row block'
     elif blockType == 3:
         whichScheme = 'Column by Column bit and Column by Column block'
-    print('BMPRS Scheme ', whichScheme)
-    outputFile.write('BMPRS Scheme ' + whichScheme + '\n')
+    # print('BMPRS Scheme ', whichScheme)
+    # outputFile.write('BMPRS Scheme ' + whichScheme + '\n')
 
     firstBlock = arr[0:4, 0:4].flatten(bitType)
-    print('first block', firstBlock)
-    outputFile.write('first block ' + str(firstBlock) + '\n')
+    firstBlock = getStringFromNP(firstBlock)
+    # firstBlock = ''.join(map(str, firstBlock))
+    # print('first block', firstBlock)
+
+    # outputFile.write('first block ' + str(firstBlock) + '\n')
     secondBlock = ''
     thirdBlock = ''
     FourthBlock = ''
     if blockType == 0 or blockType == 2:
         secondBlock = arr[0:4, 4:8].flatten(bitType)
-        print('second block', secondBlock)
-        outputFile.write('second block ' + str(secondBlock) + '\n')
+        secondBlock = getStringFromNP(secondBlock)
+        # print('second block', secondBlock)
+        # outputFile.write('second block ' + str(secondBlock) + '\n')
         thirdBlock = arr[4:8, 0:4].flatten(bitType)
-        print('third block', thirdBlock)
-        outputFile.write('third block ' + str(thirdBlock) + '\n')
+        thirdBlock = getStringFromNP(thirdBlock)
+        # print('third block', thirdBlock)
+        # outputFile.write('third block ' + str(thirdBlock) + '\n')
 
     elif blockType == 1 or blockType == 3:
         secondBlock = arr[4:8, 0:4].flatten(bitType)
-        print('second block', secondBlock)
-        outputFile.write('second block ' + str(secondBlock) + '\n')
+        secondBlock = getStringFromNP(secondBlock)
+        # print('second block', secondBlock)
+
+        # outputFile.write('second block ' + str(secondBlock) + '\n')
 
         thirdBlock = arr[0:4, 4:8].flatten(bitType)
-        print('third block', thirdBlock)
-        outputFile.write('third block ' + str(thirdBlock) + '\n')
+        thirdBlock = getStringFromNP(thirdBlock)
+        # print('third block', thirdBlock)
+        # outputFile.write('third block ' + str(thirdBlock) + '\n')
 
-    FourthBlock = arr[4:8, 4:8].flatten(bitType)
-    print('fourth block ', FourthBlock)
-    outputFile.write('fourth block ' + str(FourthBlock) + '\n')
-    BMPRcode = ''
+    fourthBlock = arr[4:8, 4:8].flatten(bitType)
+    fourthBlock = getStringFromNP(fourthBlock)
+    # print('fourth block ', fourthBlock)
+    # outputFile.write('fourth block ' + str(FourthBlock) + '\n')
+    BMPRcode = firstBlock + secondBlock + thirdBlock + fourthBlock
     # print(firstBlock, secondBlock, thirdBlock, FourthBlock)
     # for ele in blockArr:
     #     BMPRcode = BMPRcode + ele
@@ -97,13 +108,18 @@ def getBMPRScheme(arr, schemeType):
         return generateBMPRScheme(arr, 'F', 3)
 
 
-print(_8by8BitPlanes[0])
+def getStringFromNP(arr):
+    return ''.join(map(str, arr))
+
+
 for bitPlane in _8by8BitPlanes:
-    print(bitPlane)
-    outputFile.write('bit plane \n' + str(bitPlane) + '\n')
+    print('bit plane ', bitPlane)
+    # outputFile.write('bit plane \n' + str(bitPlane) + '\n')
     i = 0
     while i < 4:
-        getBMPRScheme(bitPlane, i)
+        dataInBitPlane = getBMPRScheme(bitPlane, i)
+        encodedData = runlengthcoding.encodeRun(dataInBitPlane)
+        print(dataInBitPlane, encodedData)
         i = i + 1
 
 # print('switch output ', getBMPRScheme(_8by8BitPlanes[0], 0))
