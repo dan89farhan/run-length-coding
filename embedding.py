@@ -11,9 +11,13 @@ from scipy import misc
 
 from PIL import Image
 
+outputFile = open('output.txt', 'w')
 IMG = cv2.imread('lena_gray_8.tif', 0)
 
 _8by8BitPlanes = np.zeros((8, 8, 8))
+
+ROW_BY_ROW = 1
+COLUMN_BY_COLUMN = 2
 # print(_8by8BitPlanes)
 
 for rowIndex, row in enumerate(IMG):
@@ -27,89 +31,82 @@ for rowIndex, row in enumerate(IMG):
 
 # print(IMG)
 
-print(_8by8BitPlanes[7])
+# print(_8by8BitPlanes[0])
+"""
+Logic for BMPR Scheme to compress the bit planes
+There are four BMPR Scheme 00, 01, 10, 11
+"""
+
+
+def generateBMPRScheme(arr, bitType, blockType):
+    whichScheme = ''
+    if blockType == 0:
+        whichScheme = 'Row by Row bit and block'
+    elif blockType == 1:
+        whichScheme = 'Row by Row bit and Column by Column block'
+    elif blockType == 2:
+        whichScheme = 'Column by Column bit and Row by Row block'
+    elif blockType == 3:
+        whichScheme = 'Column by Column bit and Column by Column block'
+    print('BMPRS Scheme ', whichScheme)
+    outputFile.write('BMPRS Scheme ' + whichScheme + '\n')
+
+    firstBlock = arr[0:4, 0:4].flatten(bitType)
+    print('first block', firstBlock)
+    outputFile.write('first block ' + str(firstBlock) + '\n')
+    secondBlock = ''
+    thirdBlock = ''
+    FourthBlock = ''
+    if blockType == 0 or blockType == 2:
+        secondBlock = arr[0:4, 4:8].flatten(bitType)
+        print('second block', secondBlock)
+        outputFile.write('second block ' + str(secondBlock) + '\n')
+        thirdBlock = arr[4:8, 0:4].flatten(bitType)
+        print('third block', thirdBlock)
+        outputFile.write('third block ' + str(thirdBlock) + '\n')
+
+    elif blockType == 1 or blockType == 3:
+        secondBlock = arr[4:8, 0:4].flatten(bitType)
+        print('second block', secondBlock)
+        outputFile.write('second block ' + str(secondBlock) + '\n')
+
+        thirdBlock = arr[0:4, 4:8].flatten(bitType)
+        print('third block', thirdBlock)
+        outputFile.write('third block ' + str(thirdBlock) + '\n')
+
+    FourthBlock = arr[4:8, 4:8].flatten(bitType)
+    print('fourth block ', FourthBlock)
+    outputFile.write('fourth block ' + str(FourthBlock) + '\n')
+    BMPRcode = ''
+    # print(firstBlock, secondBlock, thirdBlock, FourthBlock)
+    # for ele in blockArr:
+    #     BMPRcode = BMPRcode + ele
+
+    return BMPRcode
+
+
+def getBMPRScheme(arr, schemeType):
+    # print('in get BMPR Scheme')
+    if schemeType == 0:
+        return generateBMPRScheme(arr, 'C', 0)
+    elif schemeType == 1:
+        return generateBMPRScheme(arr, 'C', 1)
+    elif schemeType == 2:
+        return generateBMPRScheme(arr, 'F', 2)
+    else:
+        return generateBMPRScheme(arr, 'F', 3)
+
+
+print(_8by8BitPlanes[0])
+for bitPlane in _8by8BitPlanes:
+    print(bitPlane)
+    outputFile.write('bit plane \n' + str(bitPlane) + '\n')
+    i = 0
+    while i < 4:
+        getBMPRScheme(bitPlane, i)
+        i = i + 1
+
+# print('switch output ', getBMPRScheme(_8by8BitPlanes[0], 0))
 """
 Logic for run length coding
 """
-
-#histo = plt.hist(img.ravel(),256,[0,256]); plt.show()
-# hist,bins = np.histogram(img.ravel(),256,[0,256])
-
-# max1=0
-# for i in range(0,256):
-# 	if max1 < hist[i]:
-# 		max1=hist[i]
-# 		a=i
-# min1=15654
-
-# for j in range(0,256):
-# 	if min1 >= hist[j]:
-# 		min1=hist[j]
-# 		b=j
-
-# print(hist)
-# print(img)
-# print('a=',a)
-# print('b=',b)
-# print('min1=',min1)
-# print('max1=',max1)
-
-# lena = misc.imread('lena_gray_512.tif','L')
-# print(lena.shape)
-# embed = np.zeros(shape=(512,512))
-
-# for i in range(512):
-# 	for j in range(512):
-# 		embed[i][j]=lena[i][j]
-
-# for i in range(512):
-# 	for j in range(512):
-# 		if embed[i][j]>156 and embed[i][j]<255:
-# 			embed[i,j] = embed[i][j]+1
-
-# #print(embed)
-
-# strp="hello" #secret message
-# m =''.join(format(ord(x),'08b') for x in strp)
-# print('m=',m,len(m))
-# #print(b[0])
-# #
-# #def str_to_bin(string):
-# #	l=list(string)
-# #	a=''
-# #	for i in l:
-# #		a=a+format(ord(i),'08b')
-# #	print('a=',a[1],m[1])
-# #
-# #str_to_bin("hello")
-
-# #print(m)
-# #print(len(m))
-
-# #for i in range(35):
-# 	#print(m[i])
-# #print(m[0])
-
-# ind=0
-# for i in range(512):
-# 	for j in range(512):
-# 		if(embed[i][j]==156):
-# 			if ind == len(m):
-# 				break
-# 			if m[ind] == m[1]:
-# 				#print('hello')
-# 				ind=ind+1
-# 				embed[i][j]=embed[i][j]+1
-
-# 			else:
-# 				#print('hi')
-# 				ind=ind+1
-
-# if(embed[i][j]==157):
-#     print('Hi')
-# #print('Hi)
-# #print(embed)
-
-# imgl= Image.fromarray(embed).convert('L')
-# imgl.save('my.png')
-# #imgl.show()
