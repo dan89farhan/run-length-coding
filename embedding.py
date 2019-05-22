@@ -113,13 +113,17 @@ def getStringFromNP(arr):
 
 
 for bitPlane in _8by8BitPlanes:
-    print('bit plane ', bitPlane)
+    bitPlaneIn1D = bitPlane.flatten()
+    # print('bit plane ', bitPlane.flatten())
+    encodedData = runlengthcoding.encodeRun(getStringFromNP(bitPlaneIn1D))
+    print(bitPlaneIn1D, len(bitPlaneIn1D), encodedData, len(encodedData))
     # outputFile.write('bit plane \n' + str(bitPlane) + '\n')
     i = 0
     while i < 4:
         dataInBitPlane = getBMPRScheme(bitPlane, i)
         encodedData = runlengthcoding.encodeRun(dataInBitPlane)
-        print(dataInBitPlane, encodedData)
+        print(dataInBitPlane, len(dataInBitPlane), encodedData,
+              len(encodedData))
         i = i + 1
 
 # print('switch output ', getBMPRScheme(_8by8BitPlanes[0], 0))
