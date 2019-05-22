@@ -11,15 +11,18 @@ from scipy import misc
 
 from PIL import Image
 
+import math
+
 import runlengthcoding
 
 # outputFile = open('output.txt', 'w')
 IMG = cv2.imread('lena_gray_8.tif', 0)
+width, height = IMG.shape[:2]
+blockSize = int(math.sqrt((width * height) / 4))
+print(width, height, blockSize)
+# exit()
+_8by8BitPlanes = np.zeros((8, width, height), dtype=int)
 
-_8by8BitPlanes = np.zeros((8, 8, 8), dtype=int)
-
-ROW_BY_ROW = 1
-COLUMN_BY_COLUMN = 2
 # print(_8by8BitPlanes)
 
 for rowIndex, row in enumerate(IMG):
@@ -53,7 +56,7 @@ def generateBMPRScheme(arr, bitType, blockType):
     # print('BMPRS Scheme ', whichScheme)
     # outputFile.write('BMPRS Scheme ' + whichScheme + '\n')
 
-    firstBlock = arr[0:4, 0:4].flatten(bitType)
+    firstBlock = arr[0:blockSize, 0:blockSize].flatten(bitType)
     firstBlock = getStringFromNP(firstBlock)
     # firstBlock = ''.join(map(str, firstBlock))
     # print('first block', firstBlock)
@@ -63,28 +66,32 @@ def generateBMPRScheme(arr, bitType, blockType):
     thirdBlock = ''
     FourthBlock = ''
     if blockType == 0 or blockType == 2:
-        secondBlock = arr[0:4, 4:8].flatten(bitType)
+        secondBlock = arr[0:blockSize, blockSize:2 *
+                          blockSize].flatten(bitType)
         secondBlock = getStringFromNP(secondBlock)
         # print('second block', secondBlock)
         # outputFile.write('second block ' + str(secondBlock) + '\n')
-        thirdBlock = arr[4:8, 0:4].flatten(bitType)
+        thirdBlock = arr[blockSize:2 * blockSize, blockSize:2 *
+                         blockSize].flatten(bitType)
         thirdBlock = getStringFromNP(thirdBlock)
         # print('third block', thirdBlock)
         # outputFile.write('third block ' + str(thirdBlock) + '\n')
 
     elif blockType == 1 or blockType == 3:
-        secondBlock = arr[4:8, 0:4].flatten(bitType)
+        secondBlock = arr[blockSize:2 *
+                          blockSize, 0:blockSize].flatten(bitType)
         secondBlock = getStringFromNP(secondBlock)
         # print('second block', secondBlock)
 
         # outputFile.write('second block ' + str(secondBlock) + '\n')
 
-        thirdBlock = arr[0:4, 4:8].flatten(bitType)
+        thirdBlock = arr[0:blockSize, blockSize:2 * blockSize].flatten(bitType)
         thirdBlock = getStringFromNP(thirdBlock)
         # print('third block', thirdBlock)
         # outputFile.write('third block ' + str(thirdBlock) + '\n')
 
-    fourthBlock = arr[4:8, 4:8].flatten(bitType)
+    fourthBlock = arr[blockSize:2 * blockSize, blockSize:2 *
+                      blockSize].flatten(bitType)
     fourthBlock = getStringFromNP(fourthBlock)
     # print('fourth block ', fourthBlock)
     # outputFile.write('fourth block ' + str(FourthBlock) + '\n')
