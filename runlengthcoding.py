@@ -3,7 +3,8 @@ import math
 LFIX = 4
 # print('length', len('11111111111'), len('00'), len('1'),
 #       len('00000000000000000'))
-data = '11111111111' + '00' + '1' + '00000000000000000'
+# data = '11111111111' + '00' + '1' + '00000000000000000'
+data = '0'
 
 
 def encodeRun(input_string):
@@ -123,11 +124,11 @@ def decodeRun(encodedMessage):
 # outputFile.write('encoded data \n')
 
 # print('original data', data)
-# encodedData = encodeRun(data)
-# print(encodedData)
+encodedData = encodeRun(data)
+print(encodedData)
 # outputFile.write(encodedData + '\n')
-# decodedData = decodeRun(encodedData)
-# print('decode data ', decodedData)
+decodedData = decodeRun(encodedData)
+print('decode data ', decodedData)
 # outputFile.write('decoded data\n')
 # outputFile.write(decodedData + '\n')
 

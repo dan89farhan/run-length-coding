@@ -16,7 +16,7 @@ import math
 import runlengthcoding
 
 # outputFile = open('output.txt', 'w')
-IMG = cv2.imread('lena_gray_8.tif', 0)
+IMG = cv2.imread('lena_gray_32.tif', 0)
 width, height = IMG.shape[:2]
 blockSize = int(math.sqrt((width * height) / 4))
 print(width, height, blockSize)
@@ -123,7 +123,7 @@ for bitPlane in _8by8BitPlanes:
     bitPlaneIn1D = bitPlane.flatten()
     # print('bit plane ', bitPlane.flatten())
     encodedData = runlengthcoding.encodeRun(getStringFromNP(bitPlaneIn1D))
-    print(bitPlaneIn1D, len(bitPlaneIn1D), encodedData, len(encodedData))
+    print(len(bitPlaneIn1D), len(encodedData))
     # outputFile.write('bit plane \n' + str(bitPlane) + '\n')
     i = 0
     while i < 4:
@@ -132,6 +132,7 @@ for bitPlane in _8by8BitPlanes:
         print(dataInBitPlane, len(dataInBitPlane), encodedData,
               len(encodedData))
         i = i + 1
+    print('\n')
 
 # print('switch output ', getBMPRScheme(_8by8BitPlanes[0], 0))
 """
