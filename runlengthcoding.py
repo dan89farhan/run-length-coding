@@ -4,7 +4,7 @@ LFIX = 4
 # print('length', len('11111111111'), len('00'), len('1'),
 #       len('00000000000000000'))
 # data = '11111111111' + '00' + '1' + '00000000000000000'
-data = '0'
+data = '110010000'
 
 
 def encodeRun(input_string):
@@ -75,6 +75,7 @@ def decodeRun(encodedMessage):
                 count += 1
 
             wordLength = 2**(count)
+            # print('wordLength', wordLength, count)
             sym = ''
             while count > 0 and charIndex < length:
                 charIndex += 1
@@ -83,14 +84,18 @@ def decodeRun(encodedMessage):
                 count -= 1
             symLength = int(sym, 2)
 
+            # print('sym ', sym, symLength)
+
             wordLength = wordLength + symLength
+            # print('word length', wordLength)
             count = 0
 
+            charIndex += 1
             for i in range(wordLength):
                 decodeMessage = decodeMessage + encodedMessage[charIndex]
             # print(decodeMessage)
             wordLength = 0
-            charIndex += 1
+            # charIndex += 1
 
         elif encodedMessage[charIndex] == '0':
             charIndex += 1
@@ -132,4 +137,4 @@ print('decode data ', decodedData)
 # outputFile.write('decoded data\n')
 # outputFile.write(decodedData + '\n')
 
-# print(data == decodedData)
+print(data == decodedData)
