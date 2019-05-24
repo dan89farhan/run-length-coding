@@ -129,12 +129,12 @@ def decodeRun(encodedMessage):
 # outputFile.write('encoded data \n')
 
 # print('original data', data)
-encodedData = encodeRun(data)
-print(encodedData)
+# encodedData = encodeRun(data)
+# print(encodedData)
 # outputFile.write(encodedData + '\n')
-decodedData = decodeRun(encodedData)
-print('decode data ', decodedData)
+# decodedData = decodeRun(encodedData)
+# print('decode data ', decodedData)
 # outputFile.write('decoded data\n')
 # outputFile.write(decodedData + '\n')
 
-print(data == decodedData)
+# print(data == decodedData)

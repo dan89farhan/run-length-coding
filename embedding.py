@@ -16,14 +16,23 @@ import math
 import runlengthcoding
 
 # outputFile = open('output.txt', 'w')
-IMG = cv2.imread('lena_gray_8.tif', 0)
+IMG = cv2.imread('lena_gray_32.tif', 0)
 width, height = IMG.shape[:2]
 blockSize = int(math.sqrt((width * height) / 4))
-print(width, height, blockSize)
-# exit()
+NOOFBITCOMPRESSED = 2
+# print(width, height, blockSize)
+
 _8by8BitPlanes = np.zeros((8, width, height), dtype=int)
 
-# print(_8by8BitPlanes)
+_8by8BitCompressedBitPlanes = np.zeros((8, width, height), dtype=int)
+
+binBlockSize = format(blockSize, '05b')
+binLFIX = format(runlengthcoding.LFIX, '03b')
+bitNoOfBitCompressed = format(NOOFBITCOMPRESSED, '02b')
+print(binBlockSize, binLFIX, bitNoOfBitCompressed)
+exit()
+
+# print(binBlockSize)
 
 for rowIndex, row in enumerate(IMG):
     for colIndex, col in enumerate(row):
@@ -119,7 +128,7 @@ def getStringFromNP(arr):
     return ''.join(map(str, arr))
 
 
-for bitPlane in _8by8BitPlanes:
+for bitPlane in np.flip(_8by8BitPlanes):
     bitPlaneIn1D = bitPlane.flatten()
     # print('bit plane ', bitPlane.flatten())
     encodedData = runlengthcoding.encodeRun(getStringFromNP(bitPlaneIn1D))
@@ -130,12 +139,7 @@ for bitPlane in _8by8BitPlanes:
         dataInBitPlane = getBMPRScheme(bitPlane, i)
         encodedData = runlengthcoding.encodeRun(dataInBitPlane)
         decodedData = runlengthcoding.decodeRun(encodedData)
-        # print(dataInBitPlane, len(dataInBitPlane), encodedData,
-        #       len(encodedData))
+        print(len(dataInBitPlane), len(encodedData))
+        # print(dataInBitPlane == decodedData)
         i = i + 1
     print('\n')
-
-# print('switch output ', getBMPRScheme(_8by8BitPlanes[0], 0))
-"""
-Logic for run length coding
-"""
