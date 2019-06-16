@@ -15,6 +15,10 @@ import math
 
 import runlengthcoding
 
+import sys
+
+np.set_printoptions(threshold=sys.maxsize)
+
 # outputFile = open('output.txt', 'w')
 IMG = cv2.imread('lena_gray_32.tif', 0)
 width, height = IMG.shape[:2]
@@ -22,15 +26,44 @@ blockSize = int(math.sqrt((width * height) / 4))
 NOOFBITCOMPRESSED = 2
 # print(width, height, blockSize)
 
-_8by8BitPlanes = np.zeros((8, width, height), dtype=int)
-
-_8by8BitCompressedBitPlanes = np.zeros((8, width, height), dtype=int)
+_8by8BitPlanes = np.ones((8, width, height), dtype=int)
+_8by8BitPlanes = np.negative(_8by8BitPlanes)
+_8by8BitCompressedBitPlanes = np.ones((8, width, height), dtype=int)
+_8by8BitCompressedBitPlanes = np.negative(_8by8BitCompressedBitPlanes)
 
 binBlockSize = format(blockSize, '05b')
 binLFIX = format(runlengthcoding.LFIX, '03b')
-bitNoOfBitCompressed = format(NOOFBITCOMPRESSED, '02b')
-print(binBlockSize, binLFIX, bitNoOfBitCompressed)
-exit()
+binNoOfBitCompressed = format(NOOFBITCOMPRESSED, '02b')
+
+row8By8CompressedBitPlane = 7
+col8By8CompressedBitPlane = 0
+binBitPlaneIndex = 0
+count = 0
+
+for binBlockContent in binBlockSize:
+    _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][
+        col8By8CompressedBitPlane][binBitPlaneIndex] = binBlockContent
+    # print('compressed bit plane ',
+    #       _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][col8By8CompressedBitPlane][binBitPlaneIndex])
+    binBitPlaneIndex = binBitPlaneIndex + 1
+for binLFIXContent in binLFIX:
+    _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][
+        col8By8CompressedBitPlane][binBitPlaneIndex] = binLFIXContent
+    # print('compressed bit plane ',
+    #       _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][col8By8CompressedBitPlane][binBitPlaneIndex])
+    binBitPlaneIndex = binBitPlaneIndex + 1
+for binNoOfBitCompressedContent in binNoOfBitCompressed:
+    _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][
+        col8By8CompressedBitPlane][
+            binBitPlaneIndex] = binNoOfBitCompressedContent
+    # print('compressed bit plane ',
+    #       _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][col8By8CompressedBitPlane][binBitPlaneIndex])
+
+    binBitPlaneIndex = binBitPlaneIndex + 1
+
+# print(binBlockSize, binLFIX, binNoOfBitCompressed, binBitPlaneIndex,
+#       _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane])
+# exit()
 
 # print(binBlockSize)
 
@@ -61,7 +94,7 @@ def generateBMPRScheme(arr, bitType, blockType):
     elif blockType == 2:
         whichScheme = 'Column by Column bit and Row by Row block'
     elif blockType == 3:
-        whichScheme = 'Column by Column bit and Column by Column block'
+        whichScheme = 'Column by Column bit and block'
     # print('BMPRS Scheme ', whichScheme)
     # outputFile.write('BMPRS Scheme ' + whichScheme + '\n')
 
@@ -128,18 +161,56 @@ def getStringFromNP(arr):
     return ''.join(map(str, arr))
 
 
+compressedBitPlaneCount = -1
+
 for bitPlane in np.flip(_8by8BitPlanes):
+    compressedBitPlaneCount = compressedBitPlaneCount + 1
     bitPlaneIn1D = bitPlane.flatten()
     # print('bit plane ', bitPlane.flatten())
-    encodedData = runlengthcoding.encodeRun(getStringFromNP(bitPlaneIn1D))
+    # encodedData = runlengthcoding.encodeRun(getStringFromNP(bitPlaneIn1D))
     # print(len(bitPlaneIn1D), len(encodedData))
     # outputFile.write('bit plane \n' + str(bitPlane) + '\n')
     i = 0
+    min = sys.maxsize
+    minEncodedData = ''
     while i < 4:
         dataInBitPlane = getBMPRScheme(bitPlane, i)
         encodedData = runlengthcoding.encodeRun(dataInBitPlane)
-        decodedData = runlengthcoding.decodeRun(encodedData)
-        print(len(dataInBitPlane), len(encodedData))
-        # print(dataInBitPlane == decodedData)
+        lenEncodedData = len(encodedData)
+        # decodedData = runlengthcoding.decodeRun(encodedData)
+        # print(len(dataInBitPlane), len(encodedData))
+        if min > lenEncodedData:
+            min = lenEncodedData
+            minEncodedData = encodedData
+
         i = i + 1
+
+    if compressedBitPlaneCount < 1:
+        binLenEncodedData = "{0:b}".format(min)
+        print('min is ', min, ' len bin encoded data ', binLenEncodedData,
+              ' binBitPlaneIndex ', binBitPlaneIndex,
+              ' compressedBitPlaneCount ', compressedBitPlaneCount)
+        for x in binLenEncodedData:
+            _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][
+                col8By8CompressedBitPlane][binBitPlaneIndex] = x
+            binBitPlaneIndex = binBitPlaneIndex + 1
+            if binBitPlaneIndex > 31:
+                binBitPlaneIndex = 0
+                col8By8CompressedBitPlane = col8By8CompressedBitPlane + 1
+        print('_8by8BitCompressedBitPlanes ', _8by8BitCompressedBitPlanes[7])
+        count = 0
+        for x in encodedData:
+            # count = count + 1
+            # print('x is ', x, count, col8By8CompressedBitPlane, binBitPlaneIndex)
+
+            _8by8BitCompressedBitPlanes[row8By8CompressedBitPlane][
+                col8By8CompressedBitPlane][binBitPlaneIndex] = x
+            binBitPlaneIndex = binBitPlaneIndex + 1
+            if binBitPlaneIndex > 31:
+                binBitPlaneIndex = 0
+                col8By8CompressedBitPlane = col8By8CompressedBitPlane + 1
+            # print(x)
+        # print('length ', min)
+    # compressedBitPlaneCount = compressedBitPlaneCount + 1
     print('\n')
+print(_8by8BitCompressedBitPlanes[7])
